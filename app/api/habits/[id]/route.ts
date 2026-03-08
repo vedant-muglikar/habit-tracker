@@ -54,13 +54,50 @@ export async function PATCH(
     if (action === "checkIn") {
       const today = new Date().toISOString().split("T")[0];
 
-      // Update streak and last_checked_in
-      await pool.query(
-        "UPDATE performance SET streak = streak + 1 WHERE habit_id = ?",
+      // Get current streak and last check-in date
+      const [rows] = await pool.query<RowDataPacket[]>(
+        "SELECT streak, last_checked_in FROM performance WHERE habit_id = ?",
         [habitId],
       );
 
-      return NextResponse.json({ message: "Checked in successfully" });
+      if (rows.length === 0) {
+        return NextResponse.json(
+          { error: "Habit performance record not found" },
+          { status: 404 },
+        );
+      }
+
+      const currentStreak = rows[0].streak || 0;
+      const lastCheckedIn = rows[0].last_checked_in;
+
+      let newStreak = 1; // Default: start fresh streak
+
+      if (lastCheckedIn) {
+        const lastDate = new Date(lastCheckedIn);
+        const todayDate = new Date(today);
+        const diffTime = todayDate.getTime() - lastDate.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+          // Already checked in today, don't change streak
+          newStreak = currentStreak;
+        } else if (diffDays === 1) {
+          // Consecutive day, increment streak
+          newStreak = currentStreak + 1;
+        }
+        // else: diffDays > 1, streak is reset to 1 (missed days)
+      }
+
+      // Update streak and last_checked_in
+      await pool.query(
+        "UPDATE performance SET streak = ?, last_checked_in = ? WHERE habit_id = ?",
+        [newStreak, today, habitId],
+      );
+
+      return NextResponse.json({
+        message: "Checked in successfully",
+        streak: newStreak,
+      });
     }
 
     if (action === "toggleActive") {

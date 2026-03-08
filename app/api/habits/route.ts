@@ -5,13 +5,13 @@ import { RowDataPacket, ResultSetHeader } from "mysql2";
 export async function GET() {
   try {
     const query =
-      "select * from habits h left join habit_category hc on h.cat_hab_id = hc.id left join performance p on h.id = p.habit_id where h.is_active = 1";
+      "SELECT h.id, h.habit_name, h.is_active, hc.type, p.start_date, p.streak FROM habits h LEFT JOIN habit_category hc ON h.cat_hab_id = hc.id LEFT JOIN performance p ON h.id = p.habit_id WHERE h.is_active = 1";
 
     const [rows] = await pool.query<RowDataPacket[]>(query);
 
     // Transform database rows to frontend format
     const habits = rows.map((row: any) => ({
-      id: row.id?.toString(),
+      id: row.id.toString(),
       name: row.habit_name,
       category: row.type,
       active: row.is_active === 1 || row.is_active === true,
@@ -31,7 +31,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, category } = body;
+    const { name, category, description } = body;
 
     // Get category ID from category name
     const [categoryRows] = await pool.query<RowDataPacket[]>(
@@ -65,6 +65,14 @@ export async function POST(request: NextRequest) {
       "INSERT INTO performance (habit_id, start_date, streak) VALUES (?, ?, ?)",
       [habitId, startDate, 0],
     );
+
+    // Insert into habit_description table if description is provided
+    if (description && description.trim()) {
+      await pool.query<ResultSetHeader>(
+        "INSERT INTO habit_description (habit_id, description) VALUES (?, ?)",
+        [habitId, description.trim()],
+      );
+    }
 
     return NextResponse.json(
       {

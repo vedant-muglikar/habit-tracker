@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -44,7 +45,11 @@ interface Habit {
 
 export default function HabitTracker() {
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [formData, setFormData] = useState({ name: "", category: "health" });
+  const [formData, setFormData] = useState({
+    name: "",
+    category: "health",
+    description: "",
+  });
   const [loading, setLoading] = useState(true);
   const { theme, setTheme } = useTheme();
 
@@ -79,13 +84,14 @@ export default function HabitTracker() {
         body: JSON.stringify({
           name: formData.name,
           category: formData.category,
+          description: formData.description,
         }),
       });
 
       if (response.ok) {
         const newHabit = await response.json();
         setHabits([...habits, newHabit]);
-        setFormData({ name: "", category: "health" });
+        setFormData({ name: "", category: "health", description: "" });
       }
     } catch (error) {
       console.error("Failed to add habit:", error);
@@ -294,35 +300,43 @@ export default function HabitTracker() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form
-              onSubmit={addHabit}
-              className="flex flex-col lg:flex-row gap-3">
-              <Input
-                type="text"
-                placeholder="Habit name (e.g., Morning Run)"
-                value={formData.name}
+            <form onSubmit={addHabit} className="flex flex-col gap-3">
+              <div className="flex flex-col lg:flex-row gap-3">
+                <Input
+                  type="text"
+                  placeholder="Habit name (e.g., Morning Run)"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  className="flex-1"
+                  required
+                />
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, category: value })
+                  }>
+                  <SelectTrigger className="w-full lg:w-48">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="health">🏥 Health</SelectItem>
+                    <SelectItem value="fitness">💪 Fitness</SelectItem>
+                    <SelectItem value="learning">📚 Learning</SelectItem>
+                    <SelectItem value="wellness">🧘 Wellness</SelectItem>
+                    <SelectItem value="work">💼 Work</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Textarea
+                placeholder="Description (optional - e.g., Run for 30 minutes every morning)"
+                value={formData.description}
                 onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
+                  setFormData({ ...formData, description: e.target.value })
                 }
-                className="flex-1"
-                required
+                className="min-h-[80px] resize-none"
               />
-              <Select
-                value={formData.category}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, category: value })
-                }>
-                <SelectTrigger className="w-full lg:w-48">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="health">🏥 Health</SelectItem>
-                  <SelectItem value="fitness">💪 Fitness</SelectItem>
-                  <SelectItem value="learning">📚 Learning</SelectItem>
-                  <SelectItem value="wellness">🧘 Wellness</SelectItem>
-                  <SelectItem value="work">💼 Work</SelectItem>
-                </SelectContent>
-              </Select>
               <Button type="submit" className="w-full lg:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Habit

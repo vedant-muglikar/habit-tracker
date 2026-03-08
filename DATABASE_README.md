@@ -25,6 +25,7 @@ habit_id INT NOT NULL,
 start_date DATE NOT NULL,
 end_date DATE,
 streak INT DEFAULT 0,
+last_checked_in DATE,
 FOREIGN KEY (habit_id) REFERENCES habits(id)
 );
 

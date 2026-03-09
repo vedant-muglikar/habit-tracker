@@ -195,18 +195,20 @@ export default function HabitTracker() {
     activeHabits > 0 ? (completedToday / activeHabits) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-50 via-white to-cyan-50 dark:from-indigo-950/40 dark:via-background dark:to-cyan-950/20">
+      <div className="container mx-auto px-4 py-10 max-w-7xl">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Target className="h-8 w-8 text-primary" />
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-cyan-500 rounded-xl shadow-lg shadow-indigo-500/20">
+                <Target className="h-7 w-7 text-white" />
+              </div>
+              <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-cyan-500 dark:from-indigo-400 dark:to-cyan-400 bg-clip-text text-transparent transform transition-all tracking-tight">
                 Habit Tracker
               </h1>
             </div>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-lg ml-1 font-medium">
               Build better habits, one day at a time
             </p>
           </div>
@@ -214,94 +216,94 @@ export default function HabitTracker() {
             variant="outline"
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="rounded-full">
-            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            className="rounded-full shadow-md bg-white/50 dark:bg-black/20 backdrop-blur border-indigo-100 dark:border-indigo-900/30 hover:bg-white dark:hover:bg-black/40 transition-all h-11 w-11">
+            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-amber-500" />
+            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-indigo-400" />
             <span className="sr-only">Toggle theme</span>
           </Button>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+          <Card className="bg-white/70 dark:bg-black/40 backdrop-blur-xl border-indigo-200/60 dark:border-white/5 shadow-xl shadow-blue-900/5 dark:shadow-blue-900/10 transition-transform hover:scale-[1.02]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-blue-600 dark:text-blue-400">
+              <CardTitle className="text-sm font-semibold tracking-wide text-blue-600 dark:text-blue-400 uppercase">
                 Active Habits
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+              <div className="text-3xl font-extrabold text-blue-950 dark:text-blue-50">
                 {activeHabits}
               </div>
-              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+              <p className="text-sm font-medium text-blue-600/70 dark:text-blue-400/70 mt-1">
                 Currently tracking
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-orange-200 dark:border-orange-800">
+          <Card className="bg-white/70 dark:bg-black/40 backdrop-blur-xl border-indigo-200/60 dark:border-white/5 shadow-xl shadow-orange-900/5 dark:shadow-orange-900/10 transition-transform hover:scale-[1.02]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-orange-600 dark:text-orange-400 flex items-center gap-2">
+              <CardTitle className="text-sm font-semibold tracking-wide text-orange-600 dark:text-orange-400 flex items-center gap-2 uppercase">
                 <Flame className="h-4 w-4" />
                 Total Streak
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-700 dark:text-orange-300">
+              <div className="text-3xl font-extrabold text-orange-950 dark:text-orange-50">
                 {totalStreak}
               </div>
-              <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+              <p className="text-sm font-medium text-orange-600/70 dark:text-orange-400/70 mt-1">
                 Days combined
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800">
+          <Card className="bg-white/70 dark:bg-black/40 backdrop-blur-xl border-indigo-200/60 dark:border-white/5 shadow-xl shadow-green-900/5 dark:shadow-green-900/10 transition-transform hover:scale-[1.02]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-green-600 dark:text-green-400">
-                Completed Today
+              <CardTitle className="text-sm font-semibold tracking-wide text-green-600 dark:text-green-400 uppercase">
+                Completed
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-700 dark:text-green-300">
+              <div className="text-3xl font-extrabold text-green-950 dark:text-green-50">
                 {completedToday}
               </div>
-              <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                Of {activeHabits} habits
+              <p className="text-sm font-medium text-green-600/70 dark:text-green-400/70 mt-1">
+                Of {activeHabits} habits today
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-800">
+          <Card className="bg-white/70 dark:bg-black/40 backdrop-blur-xl border-indigo-200/60 dark:border-white/5 shadow-xl shadow-purple-900/5 dark:shadow-purple-900/10 transition-transform hover:scale-[1.02]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-purple-600 dark:text-purple-400 flex items-center gap-2">
+              <CardTitle className="text-sm font-semibold tracking-wide text-purple-600 dark:text-purple-400 flex items-center gap-2 uppercase">
                 <TrendingUp className="h-4 w-4" />
                 Progress
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+              <div className="text-3xl font-extrabold text-purple-950 dark:text-purple-50">
                 {Math.round(completionRate)}%
               </div>
-              <Progress value={completionRate} className="mt-2 h-2" />
+              <Progress value={completionRate} className="mt-3 h-2.5 bg-purple-100 dark:bg-purple-950" />
             </CardContent>
           </Card>
         </div>
 
         {/* Add Habit Form */}
-        <Card className="mb-8">
+        <Card className="mb-10 bg-white/70 dark:bg-black/40 backdrop-blur-xl border-indigo-200/60 dark:border-white/5 shadow-xl shadow-indigo-900/5">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Plus className="h-5 w-5 text-indigo-500" />
               Add New Habit
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base text-muted-foreground/80">
               Start tracking a new habit to build consistency
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={addHabit} className="flex flex-col gap-3">
-              <div className="flex flex-col lg:flex-row gap-3">
+            <form onSubmit={addHabit} className="flex flex-col gap-4">
+              <div className="flex flex-col lg:flex-row gap-4">
                 <Input
                   type="text"
                   placeholder="Habit name (e.g., Morning Run)"
@@ -309,7 +311,7 @@ export default function HabitTracker() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="flex-1"
+                  className="flex-1 h-12 rounded-xl border-indigo-100 dark:border-indigo-900/30 bg-white/50 dark:bg-black/20 focus-visible:ring-indigo-500/50"
                   required
                 />
                 <Select
@@ -317,15 +319,15 @@ export default function HabitTracker() {
                   onValueChange={(value) =>
                     setFormData({ ...formData, category: value })
                   }>
-                  <SelectTrigger className="w-full lg:w-48">
+                  <SelectTrigger className="w-full lg:w-48 h-12 rounded-xl border-indigo-100 dark:border-indigo-900/30 bg-white/50 dark:bg-black/20 focus:ring-indigo-500/50">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="health">🏥 Health</SelectItem>
-                    <SelectItem value="fitness">💪 Fitness</SelectItem>
-                    <SelectItem value="learning">📚 Learning</SelectItem>
-                    <SelectItem value="wellness">🧘 Wellness</SelectItem>
-                    <SelectItem value="work">💼 Work</SelectItem>
+                  <SelectContent className="rounded-xl border-indigo-100 dark:border-indigo-900/30">
+                    <SelectItem value="health" className="rounded-lg">🏥 Health</SelectItem>
+                    <SelectItem value="fitness" className="rounded-lg">💪 Fitness</SelectItem>
+                    <SelectItem value="learning" className="rounded-lg">📚 Learning</SelectItem>
+                    <SelectItem value="wellness" className="rounded-lg">🧘 Wellness</SelectItem>
+                    <SelectItem value="work" className="rounded-lg">💼 Work</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -335,12 +337,14 @@ export default function HabitTracker() {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="min-h-[80px] resize-none"
+                className="min-h-[100px] resize-none rounded-xl border-indigo-100 dark:border-indigo-900/30 bg-white/50 dark:bg-black/20 focus-visible:ring-indigo-500/50 p-4"
               />
-              <Button type="submit" className="w-full lg:w-auto">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Habit
-              </Button>
+              <div className="flex justify-end">
+                <Button type="submit" className="w-full lg:w-auto h-12 px-8 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-700 hover:to-cyan-600 text-white shadow-lg shadow-indigo-500/20 transition-all hover:scale-[1.02]">
+                  <Plus className="h-5 w-5 mr-2" />
+                  Add Habit
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>
@@ -369,7 +373,7 @@ export default function HabitTracker() {
                   </p>
                   <Button
                     onClick={() =>
-                      document.querySelector('input[type="text"]')?.focus()
+                      (document.querySelector('input[type="text"]') as HTMLElement)?.focus()
                     }>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Your First Habit

@@ -28,6 +28,7 @@ interface Habit {
 interface HabitCardProps {
   habit: Habit;
   checkIn: (id: string) => void;
+  uncheckIn: (id: string) => void;
   toggleActive: (id: string) => void;
   deleteHabit: (id: string) => void;
   today: string;
@@ -49,6 +50,7 @@ const getCategoryIcon = (category: string) => {
 const HabitCard: React.FC<HabitCardProps> = ({
   habit,
   checkIn,
+  uncheckIn,
   toggleActive,
   deleteHabit,
   today,
@@ -186,17 +188,18 @@ const HabitCard: React.FC<HabitCardProps> = ({
         <div className="flex flex-col sm:flex-row gap-3">
           {habit.active && (
             <Button
-              onClick={() => checkIn(habit.id)}
-              disabled={isCheckedInToday}
+              onClick={() => isCheckedInToday ? uncheckIn(habit.id) : checkIn(habit.id)}
               className={`flex-1 rounded-xl shadow-md transition-all h-11 ${
                 isCheckedInToday
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-600 hover:to-teal-500 text-white shadow-emerald-500/20 opacity-100"
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-red-500 hover:to-orange-500 text-white shadow-emerald-500/20 opacity-100 group/btn"
                   : "bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white shadow-indigo-500/20"
               }`}>
               {isCheckedInToday ? (
                 <>
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  Completed Today
+                  <CheckCircle className="h-5 w-5 mr-2 group-hover/btn:hidden" />
+                  <Circle className="h-5 w-5 mr-2 hidden group-hover/btn:block group-hover/btn:text-white" />
+                  <span className="group-hover/btn:hidden">Checked In</span>
+                  <span className="hidden group-hover/btn:block">Uncheck</span>
                 </>
               ) : (
                 <>

@@ -9,16 +9,44 @@ export async function GET() {
 
     const [rows] = await pool.query<RowDataPacket[]>(query);
 
+    const today = new Date().toISOString().split("T")[0];
+    const todayDate = new Date(`${today}T00:00:00Z`);
+
+    const habitsToReset: number[] = [];
+
     // Transform database rows to frontend format
-    const habits = rows.map((row: any) => ({
-      id: row.id.toString(),
-      name: row.habit_name,
-      category: row.type,
-      active: row.is_active === 1 || row.is_active === true,
-      startDate: row.start_date || new Date().toISOString().split("T")[0],
-      streak: row.streak || 0,
-      lastCheckedIn: row.last_checked_in || null,
-    }));
+    const habits = rows.map((row: any) => {
+      let effectiveStreak = row.streak || 0;
+      const lastCheckedIn = row.last_checked_in || null;
+
+      if (lastCheckedIn && effectiveStreak > 0) {
+        const lastDate = new Date(`${lastCheckedIn}T00:00:00Z`);
+        const diffTime = todayDate.getTime() - lastDate.getTime();
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 1) {
+          effectiveStreak = 0;
+          habitsToReset.push(row.id);
+        }
+      }
+
+      return {
+        id: row.id.toString(),
+        name: row.habit_name,
+        category: row.type,
+        active: row.is_active === 1 || row.is_active === true,
+        startDate: row.start_date || new Date().toISOString().split("T")[0],
+        streak: effectiveStreak,
+        lastCheckedIn: lastCheckedIn,
+      };
+    });
+
+    if (habitsToReset.length > 0) {
+      // Async update in the background so we don't block the request unnecessarily
+      pool.query("UPDATE performance SET streak = 0 WHERE habit_id IN (?)", [
+        habitsToReset,
+      ]).catch(err => console.error("Failed to reset streaks:", err));
+    }
 
     return NextResponse.json(habits);
   } catch (error) {

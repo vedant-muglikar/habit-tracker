@@ -108,6 +108,54 @@ export async function PATCH(
       });
     }
 
+    if (action === "uncheckIn") {
+      const today = new Date().toISOString().split("T")[0];
+
+      // Get current streak and last check-in date
+      const [rows] = await pool.query<RowDataPacket[]>(
+        "SELECT streak, DATE_FORMAT(last_checked_in, '%Y-%m-%d') AS last_checked_in FROM performance WHERE habit_id = ?",
+        [habitId],
+      );
+
+      if (rows.length === 0) {
+        return NextResponse.json(
+          { error: "Habit performance record not found" },
+          { status: 404 },
+        );
+      }
+
+      const currentStreak = rows[0].streak || 0;
+      const lastCheckedInStr = rows[0].last_checked_in;
+
+      if (lastCheckedInStr !== today) {
+        return NextResponse.json(
+          { message: "Not checked in today" },
+          { status: 400 },
+        );
+      }
+
+      const newStreak = Math.max(0, currentStreak - 1);
+      
+      let newLastCheckedIn: string | null = null;
+      if (newStreak > 0) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        newLastCheckedIn = yesterday.toISOString().split("T")[0];
+      }
+
+      // Update streak and last_checked_in
+      await pool.query(
+        "UPDATE performance SET streak = ?, last_checked_in = ? WHERE habit_id = ?",
+        [newStreak, newLastCheckedIn, habitId],
+      );
+
+      return NextResponse.json({
+        message: "Unchecked successfully",
+        streak: newStreak,
+        lastCheckedIn: newLastCheckedIn,
+      });
+    }
+
     if (action === "toggleActive") {
       await pool.query("UPDATE habits SET is_active = ? WHERE id = ?", [
         active ? 1 : 0,

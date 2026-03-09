@@ -52,11 +52,24 @@ export default function HabitTracker() {
   });
   const [loading, setLoading] = useState(true);
   const { theme, setTheme } = useTheme();
+  const [today, setToday] = useState(new Date().toISOString().split("T")[0]);
 
   // Fetch habits from database
   useEffect(() => {
     fetchHabits();
   }, []);
+
+  // Update "today" dynamically so check-ins reset at midnight
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newToday = new Date().toISOString().split("T")[0];
+      if (newToday !== today) {
+        setToday(newToday);
+        fetchHabits();
+      }
+    }, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, [today]);
 
   const fetchHabits = async () => {
     try {
@@ -99,7 +112,6 @@ export default function HabitTracker() {
   };
 
   const checkIn = async (id: string) => {
-    const today = new Date().toISOString().split("T")[0];
     const habit = habits.find((h) => h.id === id);
 
     if (habit?.lastCheckedIn === today) return;
@@ -122,6 +134,32 @@ export default function HabitTracker() {
       }
     } catch (error) {
       console.error("Failed to check in:", error);
+    }
+  };
+
+  const uncheckIn = async (id: string) => {
+    const habit = habits.find((h) => h.id === id);
+    if (habit?.lastCheckedIn !== today) return;
+
+    try {
+      const response = await fetch(`/api/habits/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "uncheckIn" }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setHabits(
+          habits.map((h) =>
+            h.id === id
+              ? { ...h, streak: data.streak, lastCheckedIn: data.lastCheckedIn }
+              : h,
+          ),
+        );
+      }
+    } catch (error) {
+      console.error("Failed to uncheck in:", error);
     }
   };
 
@@ -184,8 +222,6 @@ export default function HabitTracker() {
     };
     return colors[category] || "#f3f4f6";
   };
-
-  const today = new Date().toISOString().split("T")[0];
 
   // Calculate stats
   const activeHabits = habits.filter((h) => h.active).length;
@@ -388,6 +424,7 @@ export default function HabitTracker() {
                   key={habit.id}
                   habit={habit}
                   checkIn={checkIn}
+                  uncheckIn={uncheckIn}
                   toggleActive={toggleActive}
                   deleteHabit={deleteHabit}
                   today={today}

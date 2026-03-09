@@ -5,7 +5,7 @@ import { RowDataPacket, ResultSetHeader } from "mysql2";
 export async function GET() {
   try {
     const query =
-      "SELECT h.id, h.habit_name, h.is_active, hc.type, p.start_date, p.streak FROM habits h LEFT JOIN habit_category hc ON h.cat_hab_id = hc.id LEFT JOIN performance p ON h.id = p.habit_id WHERE h.is_active = 1";
+      "SELECT h.id, h.habit_name, h.is_active, hc.type, DATE_FORMAT(p.start_date, '%Y-%m-%d') AS start_date, p.streak, DATE_FORMAT(p.last_checked_in, '%Y-%m-%d') AS last_checked_in FROM habits h LEFT JOIN habit_category hc ON h.cat_hab_id = hc.id LEFT JOIN performance p ON h.id = p.habit_id WHERE h.is_active = 1";
 
     const [rows] = await pool.query<RowDataPacket[]>(query);
 

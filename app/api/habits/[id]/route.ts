@@ -56,7 +56,7 @@ export async function PATCH(
 
       // Get current streak and last check-in date
       const [rows] = await pool.query<RowDataPacket[]>(
-        "SELECT streak, last_checked_in FROM performance WHERE habit_id = ?",
+        "SELECT streak, DATE_FORMAT(last_checked_in, '%Y-%m-%d') AS last_checked_in FROM performance WHERE habit_id = ?",
         [habitId],
       );
 
@@ -68,22 +68,30 @@ export async function PATCH(
       }
 
       const currentStreak = rows[0].streak || 0;
-      const lastCheckedIn = rows[0].last_checked_in;
+      const lastCheckedInStr = rows[0].last_checked_in;
+
+      if (lastCheckedInStr === today) {
+        // Already checked in today, do not update db
+        return NextResponse.json({
+          message: "Already checked in today",
+          streak: currentStreak,
+        });
+      }
 
       let newStreak = 1; // Default: start fresh streak
 
-      if (lastCheckedIn) {
-        const lastDate = new Date(lastCheckedIn);
-        const todayDate = new Date(today);
+      if (lastCheckedInStr) {
+        const lastDate = new Date(`${lastCheckedInStr}T00:00:00Z`);
+        const todayDate = new Date(`${today}T00:00:00Z`);
         const diffTime = todayDate.getTime() - lastDate.getTime();
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-        if (diffDays === 0) {
-          // Already checked in today, don't change streak
-          newStreak = currentStreak;
-        } else if (diffDays === 1) {
+        if (diffDays === 1) {
           // Consecutive day, increment streak
           newStreak = currentStreak + 1;
+        } else if (diffDays <= 0) {
+          // Fallback if future date
+          newStreak = currentStreak;
         }
         // else: diffDays > 1, streak is reset to 1 (missed days)
       }

@@ -28,7 +28,6 @@ interface Habit {
 interface HabitCardProps {
   habit: Habit;
   checkIn: (id: string) => void;
-  uncheckIn: (id: string) => void;
   toggleActive: (id: string) => void;
   deleteHabit: (id: string) => void;
   today: string;
